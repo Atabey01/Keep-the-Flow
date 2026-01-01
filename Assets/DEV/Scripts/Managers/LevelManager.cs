@@ -18,6 +18,8 @@ namespace DEV.Scripts.Managers
         private GameController _gameController;
         private Dictionary<Type, IController> _controllers;
         private bool _isInitialized;
+        private LevelBuilder _levelBuilder;
+        private GameObject _levelParent;
 
         public void Initialize(GameConfig gameConfig, InputHandler inputHandler)
         {
@@ -46,8 +48,13 @@ namespace DEV.Scripts.Managers
 
             var levelID = DataSaver.GetLevelId() + 1;
             
-            Debug.Log("Starting Level: " + levelID + " | LavelName: " + levelData.name);
-
+            _levelParent = new GameObject($"Level_{levelID}");
+            
+            _levelBuilder = new LevelBuilder
+            {
+                LevelParent = _levelParent
+            };
+            
             StartControllers(levelData);
         }
 
@@ -155,14 +162,16 @@ namespace DEV.Scripts.Managers
 
         private void CreateControllers()
         {
-            _gameController = new GameController();
+            // _levelBuilder instance'ını GameController'a veriyoruz
+            // Böylece GameController, LevelParent'a erişebilir
+            _gameController = new GameController(_levelBuilder);
             AddController(_gameController);
         }
 
         private void StartControllers(LevelData levelData)
         {
             foreach (var controller in _controllers)
-                controller.Value.StartNewLevel(levelData);
+                controller.Value.StartNewLevel(levelData, _gameConfig);
         }
 
         private void DestroyControllers()

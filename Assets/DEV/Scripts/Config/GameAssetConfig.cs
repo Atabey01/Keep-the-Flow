@@ -1,4 +1,5 @@
 using AYellowpaper.SerializedCollections;
+using DEV.Scripts.GamePlay;
 using UnityEngine;
 
 namespace DEV.Scripts.Config
@@ -11,6 +12,8 @@ namespace DEV.Scripts.Config
         
         [Header("Game Prefabs")] 
         [Space(10)]
+        public Box BoxPrefab;
+        public BoxRow BoxRowPrefab;
         
         [Header("Game Materials")]
         public SerializedDictionary<Enums.ColorType, Material> Materials = new();

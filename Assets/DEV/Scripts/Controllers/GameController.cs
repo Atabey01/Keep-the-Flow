@@ -1,4 +1,6 @@
+using DEV.Scripts.Config;
 using DEV.Scripts.Data;
+using DEV.Scripts.Handlers;
 using DEV.Scripts.Interfaces;
 using UnityEngine;
 
@@ -6,12 +8,18 @@ namespace DEV.Scripts.Controllers
 {
     public class GameController : IController
     {
-        public void Initialize()
+        private readonly LevelBuilder _levelBuilder;
+        private GameConfig _gameConfig;
+
+        public GameController(LevelBuilder levelBuilder)
         {
+            _levelBuilder = levelBuilder;
         }
 
-        public void StartNewLevel(LevelData levelData)
+        public void StartNewLevel(LevelData levelData, GameConfig gameConfig)
         {
+            _gameConfig = gameConfig;
+            _levelBuilder.StartNewLevel(levelData, _gameConfig);
         }
         
         public void MouseDown(GameObject clickedGameObject)

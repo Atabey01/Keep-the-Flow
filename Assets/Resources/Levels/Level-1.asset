@@ -15,3 +15,4 @@ MonoBehaviour:
   levelName: Level-1
   skipInLoop: 0
   LevelDifficultyType: 0
+  rows: []

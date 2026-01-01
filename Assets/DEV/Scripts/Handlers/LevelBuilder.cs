@@ -1,18 +1,20 @@
-using System.Collections;
-using System.Collections.Generic;
+using DEV.Scripts.Config;
+using DEV.Scripts.Data;
 using UnityEngine;
 
-public class LevelBuilder : MonoBehaviour
+namespace DEV.Scripts.Handlers
 {
-    // Start is called before the first frame update
-    void Start()
+    public class LevelBuilder
     {
+        private LevelData _levelData;
+        private GameConfig _gameConfig;
         
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
+        public GameObject LevelParent;
         
+        public void StartNewLevel(LevelData levelData, GameConfig gameConfig)
+        {
+            _levelData = levelData;
+            _gameConfig = gameConfig;
+        }
     }
 }
