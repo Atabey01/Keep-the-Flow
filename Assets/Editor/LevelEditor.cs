@@ -40,6 +40,12 @@ namespace DEV.Editor
         // Drag painting
         private bool isDragging = false;
         private HashSet<Vector2Int> paintedCellsThisDrag = new HashSet<Vector2Int>();
+        
+        // Grid view controls
+        private float gridZoom = 1f;
+        private Vector2 gridScrollPosition = Vector2.zero;
+        private float baseCellSize = 30f;
+        private bool showGridCoordinates = false;
 
         public static LevelEditor Instance
         {
@@ -428,6 +434,31 @@ namespace DEV.Editor
                 
                 EditorGUILayout.Space(10);
                 
+                // Grid View Controls
+                EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+                EditorGUILayout.LabelField("View Controls:", EditorStyles.miniLabel);
+                
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("Zoom:", GUILayout.Width(60));
+                gridZoom = EditorGUILayout.Slider(gridZoom, 0.5f, 2f, GUILayout.Width(150));
+                if (GUILayout.Button("Reset", GUILayout.Width(50)))
+                {
+                    gridZoom = 1f;
+                    gridScrollPosition = Vector2.zero;
+                }
+                EditorGUILayout.EndHorizontal();
+                
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("Cell Size:", GUILayout.Width(60));
+                baseCellSize = EditorGUILayout.Slider(baseCellSize, 20f, 50f, GUILayout.Width(150));
+                EditorGUILayout.EndHorizontal();
+                
+                showGridCoordinates = EditorGUILayout.Toggle("Show Coordinates", showGridCoordinates);
+                
+                EditorGUILayout.EndVertical();
+                
+                EditorGUILayout.Space(5);
+                
                 // Grid Alan Görsel Gösterimi
                 DrawGridVisualization();
                 
@@ -447,35 +478,54 @@ namespace DEV.Editor
             int satirSayisi = selectedLevel.gridSatirSayisi;
             int sutunSayisi = selectedLevel.gridSutunSayisi;
             
-            // Hücre boyutu ve aralık
-            float cellSize = 30f;
-            float cellSpacing = 4f; // Hücreler arası boşluk
+            // Hücre boyutu ve aralık (zoom ve base size ile)
+            float cellSize = baseCellSize * gridZoom;
+            float cellSpacing = 4f * gridZoom; // Hücreler arası boşluk
             float totalCellSize = cellSize + cellSpacing;
             
             // Grid alanı hesapla
             float totalWidth = (sutunSayisi * totalCellSize) - cellSpacing;
             float totalHeight = (satirSayisi * totalCellSize) - cellSpacing;
             
-            // Minimum yükseklik hesapla (sadece grid + küçük padding)
+            // Padding
             float padding = 10f;
-            float minHeight = totalHeight + (padding * 2) + 20f; // 20f label için
-            Rect gridRect = GUILayoutUtility.GetRect(200, minHeight, GUILayout.ExpandWidth(true));
+            
+            // Scroll view için içerik boyutu
+            Vector2 contentSize = new Vector2(totalWidth + (padding * 2), totalHeight + (padding * 2) + 20f);
+            
+            // Scroll view başlat (sabit yükseklik, horizontal scroll için)
+            gridScrollPosition = EditorGUILayout.BeginScrollView(gridScrollPosition, 
+                false, true, // horizontal ve vertical scroll
+                GUILayout.Height(350), GUILayout.ExpandWidth(true));
+            
+            // İçerik alanı
+            Rect contentRect = GUILayoutUtility.GetRect(contentSize.x, contentSize.y, GUILayout.ExpandWidth(false));
+            
+            // Mouse wheel zoom kontrolü
+            Event currentEvent = Event.current;
+            if (contentRect.Contains(currentEvent.mousePosition) && currentEvent.type == EventType.ScrollWheel && !currentEvent.shift)
+            {
+                float zoomDelta = -currentEvent.delta.y * 0.1f;
+                gridZoom = Mathf.Clamp(gridZoom + zoomDelta, 0.5f, 2f);
+                currentEvent.Use();
+                Repaint();
+            }
             
             // Arka plan
-            EditorGUI.DrawRect(gridRect, new Color(0.12f, 0.12f, 0.12f, 1f));
+            EditorGUI.DrawRect(contentRect, new Color(0.12f, 0.12f, 0.12f, 1f));
             
             // Grid çizgileri
             Handles.BeginGUI();
             
             // Grid bilgisi (üstte kompakt)
             Handles.color = Color.white;
-            string gridInfo = $"{satirSayisi} x {sutunSayisi} Grid";
-            GUI.Label(new Rect(gridRect.x + 5, gridRect.y + 2, 200, 18), 
+            string gridInfo = $"{satirSayisi} x {sutunSayisi} Grid | Zoom: {gridZoom:F2}x";
+            GUI.Label(new Rect(contentRect.x + 5, contentRect.y + 2, 300, 18), 
                 gridInfo, EditorStyles.miniLabel);
             
-            // Grid'i ortala (daha az boşluk)
-            float gridAreaX = gridRect.x + (gridRect.width - totalWidth) * 0.5f;
-            float gridAreaY = gridRect.y + 20f; // Label için sadece 20f
+            // Grid'i ortala
+            float gridAreaX = contentRect.x + padding + (contentRect.width - totalWidth - (padding * 2)) * 0.5f;
+            float gridAreaY = contentRect.y + 20f + padding; // Label için sadece 20f
             
             // Her hücreyi buton gibi çiz
             for (int row = 0; row < satirSayisi; row++)
@@ -520,19 +570,28 @@ namespace DEV.Editor
                         new Vector3(cellRect.x, cellRect.yMax, 0),
                         new Vector3(cellRect.xMax, cellRect.yMax, 0)
                     );
+                    
+                    // Koordinat gösterimi
+                    if (showGridCoordinates && cellSize > 25f)
+                    {
+                        GUIStyle coordStyle = new GUIStyle(EditorStyles.miniLabel);
+                        coordStyle.alignment = TextAnchor.UpperLeft;
+                        coordStyle.normal.textColor = new Color(0.7f, 0.7f, 0.7f, 0.6f);
+                        coordStyle.fontSize = Mathf.Max(8, (int)(8 * gridZoom));
+                        GUI.Label(new Rect(cellRect.x + 2, cellRect.y + 2, cellRect.width, 12), 
+                            $"{col},{row}", coordStyle);
+                    }
                 }
             }
             
-            // Tıklama ve sürükleme kontrolü
-            Event currentEvent = Event.current;
-            Vector2 mousePos = currentEvent.mousePosition;
-            
-            if (currentEvent.type == EventType.MouseDown)
+            // Tıklama ve sürükleme kontrolü (scroll view koordinatlarına göre)
+            if (currentEvent.type == EventType.MouseDown && !currentEvent.alt && contentRect.Contains(currentEvent.mousePosition))
             {
                 isDragging = true;
                 paintedCellsThisDrag.Clear();
                 
                 bool isRightClick = currentEvent.button == 1;
+                Vector2 mousePos = currentEvent.mousePosition;
                 
                 for (int row = 0; row < satirSayisi; row++)
                 {
@@ -562,9 +621,10 @@ namespace DEV.Editor
                     }
                 }
             }
-            else if (currentEvent.type == EventType.MouseDrag && isDragging)
+            else if (currentEvent.type == EventType.MouseDrag && isDragging && !currentEvent.alt && contentRect.Contains(currentEvent.mousePosition))
             {
                 bool isRightClick = currentEvent.button == 1;
+                Vector2 mousePos = currentEvent.mousePosition;
                 
                 for (int row = 0; row < satirSayisi; row++)
                 {
@@ -608,6 +668,9 @@ namespace DEV.Editor
             DrawCellColors(gridAreaX, gridAreaY, cellSize, totalCellSize, satirSayisi, sutunSayisi);
             
             Handles.EndGUI();
+            
+            // Scroll view bitir
+            EditorGUILayout.EndScrollView();
         }
 
         private void DrawColorPalette()
