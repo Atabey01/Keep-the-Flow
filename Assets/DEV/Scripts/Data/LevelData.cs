@@ -66,6 +66,20 @@ namespace DEV.Scripts.Data
         }
     }
     
+    /// <summary>
+    /// Cannon Column (her sütun bir renk listesi)
+    /// </summary>
+    [Serializable]
+    public class CannonColumn
+    {
+        [SerializeField] public List<ColorType> colors = new List<ColorType>();
+        
+        public CannonColumn()
+        {
+            colors = new List<ColorType>();
+        }
+    }
+    
     [CreateAssetMenu(fileName = "NewLevelData", menuName = "Data/Level Data")]
     public class LevelData : ScriptableObject
     {
@@ -92,6 +106,10 @@ namespace DEV.Scripts.Data
         [Header("Cell Data")]
         [Tooltip("Colored cells data")]
         [SerializeField] public List<CellData> cellDataList = new List<CellData>();
+        
+        [Header("Cannon Columns")]
+        [Tooltip("Cannon columns (each column contains a list of color types)")]
+        [SerializeField] public List<CannonColumn> cannonColumns = new List<CannonColumn>();
         
         /// <summary>
         /// Level'a yeni bir satır ekler

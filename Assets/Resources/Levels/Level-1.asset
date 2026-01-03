@@ -114,3 +114,6 @@ MonoBehaviour:
     colorType: 3
   - gridPosition: {x: 4, y: 1}
     colorType: 3
+  cannonColumns:
+  - colors: 
+  - colors: 
