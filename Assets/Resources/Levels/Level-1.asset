@@ -15,4 +15,58 @@ MonoBehaviour:
   levelName: Level-1
   skipInLoop: 0
   LevelDifficultyType: 0
-  rows: []
+  rows:
+  - boxes:
+    - colorType: 1
+    - colorType: 4
+    - colorType: 2
+    - colorType: 1
+    - colorType: 1
+  - boxes:
+    - colorType: 1
+    - colorType: 4
+    - colorType: 2
+    - colorType: 1
+    - colorType: 1
+  - boxes:
+    - colorType: 0
+    - colorType: 0
+    - colorType: 0
+  gridSatirSayisi: 5
+  gridSutunSayisi: 5
+  conveyorPoints:
+  - {x: 0, y: 0}
+  - {x: 0, y: 1}
+  - {x: 0, y: 2}
+  - {x: 0, y: 3}
+  - {x: 0, y: 4}
+  - {x: 1, y: 4}
+  - {x: 2, y: 4}
+  - {x: 3, y: 4}
+  - {x: 4, y: 4}
+  - {x: 4, y: 3}
+  - {x: 4, y: 2}
+  - {x: 4, y: 1}
+  - {x: 4, y: 0}
+  - {x: 3, y: 0}
+  - {x: 2, y: 0}
+  - {x: 1, y: 0}
+  cellDataList:
+  - gridPosition: {x: 1, y: 1}
+    colorType: 0
+  - gridPosition: {x: 1, y: 2}
+    colorType: 0
+  - gridPosition: {x: 1, y: 3}
+    colorType: 0
+  - gridPosition: {x: 2, y: 3}
+    colorType: 0
+  - gridPosition: {x: 3, y: 3}
+    colorType: 0
+  - gridPosition: {x: 3, y: 2}
+    colorType: 0
+  - gridPosition: {x: 3, y: 1}
+    colorType: 0
+  - gridPosition: {x: 2, y: 1}
+    colorType: 0
+  - gridPosition: {x: 2, y: 2}
+    colorType: 2

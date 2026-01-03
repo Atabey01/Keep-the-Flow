@@ -50,6 +50,22 @@ namespace DEV.Scripts.Data
         }
     }
     
+    /// <summary>
+    /// Grid hücresindeki veri yapısı
+    /// </summary>
+    [Serializable]
+    public class CellData
+    {
+        [SerializeField] public Vector2Int gridPosition;
+        [SerializeField] public ColorType colorType;
+        
+        public CellData(Vector2Int position, ColorType color)
+        {
+            gridPosition = position;
+            colorType = color;
+        }
+    }
+    
     [CreateAssetMenu(fileName = "NewLevelData", menuName = "Data/Level Data")]
     public class LevelData : ScriptableObject
     {
@@ -61,6 +77,21 @@ namespace DEV.Scripts.Data
         [Header("Level Grid")]
         [Tooltip("Leveldaki tüm satırlar (her satır box'lardan oluşur)")]
         [SerializeField] public List<BoxRowData> rows = new List<BoxRowData>();
+        
+        [Header("Grid Area")]
+        [Tooltip("Grid row count")]
+        [SerializeField] public int gridSatirSayisi = 5;
+        
+        [Tooltip("Grid column count")]
+        [SerializeField] public int gridSutunSayisi = 5;
+        
+        [Header("Conveyor Points")]
+        [Tooltip("Conveyor path points for spline")]
+        [SerializeField] public List<Vector2Int> conveyorPoints = new List<Vector2Int>();
+        
+        [Header("Cell Data")]
+        [Tooltip("Colored cells data")]
+        [SerializeField] public List<CellData> cellDataList = new List<CellData>();
         
         /// <summary>
         /// Level'a yeni bir satır ekler

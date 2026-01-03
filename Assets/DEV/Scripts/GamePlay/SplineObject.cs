@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Splines;
+using Dreamteck.Splines;
 using Sirenix.OdinInspector;
-using Unity.Mathematics;
 #if UNITY_EDITOR
 using UnityEditor;
 using Sirenix.OdinInspector.Editor;
@@ -14,7 +13,7 @@ namespace DEV.Scripts.GamePlay
     public class SplineObject : MonoBehaviour
     {
         [Title("Spline Settings")]
-        [SerializeField] private SplineContainer splineContainer;
+        [SerializeField] private SplineComputer splineComputer;
         
         [Title("Spline Visualization")]
         [SerializeField] private Color splineColor = Color.cyan;
@@ -48,7 +47,7 @@ namespace DEV.Scripts.GamePlay
         private const float GRID_DISPLAY_SIZE = 400f;
 #endif
         
-        public SplineContainer SplineContainer => splineContainer;
+        public SplineComputer SplineComputer => splineComputer;
         public Color SplineColor => splineColor;
         public float SplineThickness => splineThickness;
         public int SplineResolution => splineResolution;
@@ -228,12 +227,12 @@ namespace DEV.Scripts.GamePlay
         
         private void Awake()
         {
-            if (splineContainer == null)
+            if (splineComputer == null)
             {
-                splineContainer = GetComponent<SplineContainer>();
-                if (splineContainer == null)
+                splineComputer = GetComponent<SplineComputer>();
+                if (splineComputer == null)
                 {
-                    splineContainer = gameObject.AddComponent<SplineContainer>();
+                    splineComputer = gameObject.AddComponent<SplineComputer>();
                 }
             }
         }
@@ -249,15 +248,14 @@ namespace DEV.Scripts.GamePlay
                 return;
             }
             
-            if (splineContainer == null)
+            if (splineComputer == null)
             {
-                splineContainer = gameObject.AddComponent<SplineContainer>();
+                splineComputer = gameObject.AddComponent<SplineComputer>();
             }
             
-            var spline = splineContainer.Spline;
-            spline.Clear();
+            // Seçili hücreleri SplinePoint array'ine çevir
+            List<SplinePoint> splinePoints = new List<SplinePoint>();
             
-            // Seçili hücreleri dünya koordinatlarına çevir
             foreach (var cell in selectedCells)
             {
                 // Hücre koordinatlarını normalized pozisyona çevir (0-1 arası)
@@ -271,13 +269,22 @@ namespace DEV.Scripts.GamePlay
                 // World space pozisyonu
                 Vector3 worldPos = transform.position + new Vector3(offsetX, 0, offsetZ);
                 
-                // Local space'e çevir ve float3'e dönüştür
-                float3 localPos = transform.InverseTransformPoint(worldPos);
-                spline.Add(new BezierKnot(localPos));
+                // Local space'e çevir
+                Vector3 localPos = transform.InverseTransformPoint(worldPos);
+                
+                // SplinePoint oluştur (Dreamteck Splines)
+                SplinePoint point = new SplinePoint(localPos);
+                splinePoints.Add(point);
             }
+            
+            // SplineComputer'a noktaları ayarla (Local space)
+            splineComputer.SetPoints(splinePoints.ToArray(), SplineComputer.Space.Local);
+            
+            Debug.Log($"Spline oluşturuldu! {splinePoints.Count} nokta eklendi.");
             
             #if UNITY_EDITOR
             UnityEditor.EditorUtility.SetDirty(this);
+            UnityEditor.EditorUtility.SetDirty(splineComputer);
             #endif
         }
     }
