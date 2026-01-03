@@ -39,6 +39,7 @@ namespace DEV.Scripts.Enums
         Orange = 5,
         Cyan = 6,
         Pink = 7,
+        None = 8,
     }
 
     /// <summary>

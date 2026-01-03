@@ -8,10 +8,15 @@ namespace DEV.Scripts.Controllers
 {
     public class GameController : IController
     {
-        private readonly LevelBuilder _levelBuilder;
+        private LevelBuilder _levelBuilder;
         private GameConfig _gameConfig;
 
         public GameController(LevelBuilder levelBuilder)
+        {
+            _levelBuilder = levelBuilder;
+        }
+        
+        public void SetLevelBuilder(LevelBuilder levelBuilder)
         {
             _levelBuilder = levelBuilder;
         }
@@ -19,6 +24,13 @@ namespace DEV.Scripts.Controllers
         public void StartNewLevel(LevelData levelData, GameConfig gameConfig)
         {
             _gameConfig = gameConfig;
+            
+            if (_levelBuilder == null)
+            {
+                Debug.LogError("GameController.StartNewLevel: _levelBuilder null!");
+                return;
+            }
+            
             _levelBuilder.StartNewLevel(levelData, _gameConfig);
         }
         

@@ -17,11 +17,20 @@ namespace DEV.Scripts.Config
         public LevelData GetLevel()
         {
 #if UNITY_EDITOR
+            // TestLevel öncelikli kontrol
+            if (TestLevel != null)
+            {
+                return TestLevel;
+            }
+            
             var testLevelIndex = PlayerPrefs.GetInt("TestLevelIndex", -1);
             if (testLevelIndex >= 0)
             {
                 PlayerPrefs.DeleteKey("TestLevelIndex");
-                return Levels[testLevelIndex % Levels.Count];
+                if (Levels != null && testLevelIndex < Levels.Count)
+                {
+                    return Levels[testLevelIndex % Levels.Count];
+                }
             }
 #endif
             // _orderedLevels null ise veya boşsa, OrganizeLevelOrder() çağır

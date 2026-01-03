@@ -1,5 +1,6 @@
 using AYellowpaper.SerializedCollections;
 using DEV.Scripts.GamePlay;
+using Dreamteck.Splines;
 using UnityEngine;
 
 namespace DEV.Scripts.Config
@@ -14,6 +15,7 @@ namespace DEV.Scripts.Config
         [Space(10)]
         public Box BoxPrefab;
         public BoxRow BoxRowPrefab;
+        public SplineComputer ConveyorPrefab;
         
         [Header("Game Materials")]
         public SerializedDictionary<Enums.ColorType, Material> Materials = new();

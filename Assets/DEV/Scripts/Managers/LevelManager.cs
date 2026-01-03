@@ -23,14 +23,28 @@ namespace DEV.Scripts.Managers
 
         public void Initialize(GameConfig gameConfig, InputHandler inputHandler)
         {
+            if (gameConfig == null)
+            {
+                Debug.LogError("LevelManager.Initialize: gameConfig null!");
+                return;
+            }
+            
+            if (inputHandler == null)
+            {
+                Debug.LogError("LevelManager.Initialize: inputHandler null!");
+                return;
+            }
+            
             _gameConfig = gameConfig;
             _inputHandler = inputHandler;
             _controllers = new Dictionary<Type, IController>();
             CreateControllers();
             AddListeners(_inputHandler);
 
+            // Event subscription'ı en sona al (tüm hazırlıklar tamamlandıktan sonra)
             StateManager.OnGameStateChanged += OnGameStateChange;
             
+            // State değişikliklerini en sona al
             StateManager.SetGameState(GameState.Pause);
             StateManager.SetGameState(GameState.Loading);
             StateManager.SetPopupState(PopupState.None);
@@ -38,8 +52,33 @@ namespace DEV.Scripts.Managers
 
         private void StartNewLevel()
         {
-            _isInitialized = true;
+            if (_gameConfig == null)
+            {
+                Debug.LogError("LevelManager.StartNewLevel: _gameConfig null!");
+                return;
+            }
+            
+            if (_gameConfig.GamePlayConfig == null)
+            {
+                Debug.LogError("LevelManager.StartNewLevel: GamePlayConfig null!");
+                return;
+            }
+            
+            if (_gameConfig.GamePlayConfig.LevelConfig == null)
+            {
+                Debug.LogError("LevelManager.StartNewLevel: LevelConfig null!");
+                return;
+            }
+            
             var levelData = _gameConfig.GamePlayConfig.LevelConfig.GetLevel();
+            
+            if (levelData == null)
+            {
+                Debug.LogError("LevelManager: LevelData null! TestLevel veya Levels listesi kontrol edilmeli.");
+                return;
+            }
+            
+            _isInitialized = true;
 
             if (levelData.LevelDifficultyType == LevelDifficultyType.Hard)
             {
@@ -55,6 +94,12 @@ namespace DEV.Scripts.Managers
                 LevelParent = _levelParent
             };
             
+            // GameController'a levelBuilder'ı set et
+            if (_gameController != null)
+            {
+                _gameController.SetLevelBuilder(_levelBuilder);
+            }
+            
             StartControllers(levelData);
         }
 
@@ -63,10 +108,23 @@ namespace DEV.Scripts.Managers
             _isInitialized = false;
             Factory.DestroyAll();
             DestroyControllers();
+            
+            if (_levelParent != null)
+            {
+                UnityEngine.Object.Destroy(_levelParent);
+                _levelParent = null;
+            }
         }
 
         private void OnGameStateChange(GameState state)
         {
+            // Null kontrolleri
+            if (_gameConfig == null || _gameConfig.GamePlayConfig == null || _gameConfig.GamePlayConfig.LevelConfig == null)
+            {
+                Debug.LogError("LevelManager.OnGameStateChange: GameConfig veya LevelConfig null!");
+                return;
+            }
+            
             if (state == GameState.Start)
             {
                 if (_isInitialized)
@@ -162,16 +220,39 @@ namespace DEV.Scripts.Managers
 
         private void CreateControllers()
         {
-            // _levelBuilder instance'ını GameController'a veriyoruz
-            // Böylece GameController, LevelParent'a erişebilir
-            _gameController = new GameController(_levelBuilder);
+            // _levelBuilder henüz null olabilir (StartNewLevel'da oluşturuluyor)
+            // GameController'a null geçebiliriz, StartNewLevel'da yeniden set edilecek
+            _gameController = new GameController(null);
             AddController(_gameController);
         }
 
         private void StartControllers(LevelData levelData)
         {
+            if (levelData == null)
+            {
+                Debug.LogError("LevelManager.StartControllers: levelData null!");
+                return;
+            }
+            
+            if (_controllers == null)
+            {
+                Debug.LogError("LevelManager.StartControllers: _controllers null!");
+                return;
+            }
+            
+            if (_gameConfig == null)
+            {
+                Debug.LogError("LevelManager.StartControllers: _gameConfig null!");
+                return;
+            }
+            
             foreach (var controller in _controllers)
-                controller.Value.StartNewLevel(levelData, _gameConfig);
+            {
+                if (controller.Value != null)
+                {
+                    controller.Value.StartNewLevel(levelData, _gameConfig);
+                }
+            }
         }
 
         private void DestroyControllers()
@@ -191,8 +272,18 @@ namespace DEV.Scripts.Managers
 
         public void Dispose()
         {
+            // Event'ten unsubscribe et
+            StateManager.OnGameStateChanged -= OnGameStateChange;
+            
             RemoveListeners(_inputHandler);
             DisposeControllers();
+            
+            // Clear references
+            _gameConfig = null;
+            _inputHandler = null;
+            _controllers = null;
+            _gameController = null;
+            _levelBuilder = null;
         }
     }
 }

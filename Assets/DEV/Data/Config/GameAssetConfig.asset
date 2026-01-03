@@ -12,5 +12,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c3b1413aa90d4fccba90462061cf133, type: 3}
   m_Name: GameAssetConfig
   m_EditorClassIdentifier: 
+  BoxPrefab: {fileID: 887914320613869264, guid: a8faaadf65f2d4fe5aef6d87670e25cd,
+    type: 3}
+  BoxRowPrefab: {fileID: 0}
+  ConveyorPrefab: {fileID: 3729208817995867157, guid: f37d70a506f5c44dd9465dbef03df067,
+    type: 3}
   Materials:
-    _serializedList: []
+    _serializedList:
+    - Key: 0
+      Value: {fileID: 2100000, guid: e15e095f8cb5144df9700534aa2aaa44, type: 2}
+    - Key: 1
+      Value: {fileID: 2100000, guid: fce6881fefb66449ba66894165ba80ea, type: 2}
+    - Key: 2
+      Value: {fileID: 2100000, guid: 9a05116d5fed04052958aedb664f844c, type: 2}
+    - Key: 3
+      Value: {fileID: 2100000, guid: 099ef0f330af149dfa547bb6581f37f9, type: 2}
+    - Key: 4
+      Value: {fileID: 2100000, guid: 22f15f523e51b411f87c6260b795e8af, type: 2}
+    - Key: 5
+      Value: {fileID: 2100000, guid: a4ae43525ba3a4f8d94fb8f165cd8e71, type: 2}
+    - Key: 6
+      Value: {fileID: 2100000, guid: c4cd06117507f42d193ce3c77333b7f9, type: 2}
+    - Key: 7
+      Value: {fileID: 2100000, guid: 99083c0dcfb484b658671b499be9232f, type: 2}
