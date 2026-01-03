@@ -676,62 +676,108 @@ namespace DEV.Editor
         private void DrawColorPalette()
         {
             EditorGUILayout.LabelField("Color Palette:", EditorStyles.miniLabel);
+            EditorGUILayout.Space(3);
             
-            // Tüm ColorType'ları göster
+            // Tüm ColorType'ları yatayda göster
             ColorType[] colorTypes = (ColorType[])System.Enum.GetValues(typeof(ColorType));
-            int colorsPerRow = 4;
             
-            for (int i = 0; i < colorTypes.Length; i += colorsPerRow)
+            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.Space(5);
+            
+            for (int i = 0; i < colorTypes.Length; i++)
             {
-                EditorGUILayout.BeginHorizontal();
+                ColorType colorType = colorTypes[i];
+                Color color = GetColorFromColorType(colorType);
                 
-                for (int j = 0; j < colorsPerRow && (i + j) < colorTypes.Length; j++)
+                // Seçili renk kontrolü
+                bool isSelected = selectedColorType == colorType;
+                
+                // Renk butonu
+                Rect buttonRect = GUILayoutUtility.GetRect(40, 40, GUILayout.Width(40), GUILayout.Height(40));
+                
+                // Gölge efekti
+                Rect shadowRect = new Rect(buttonRect.x + 2, buttonRect.y + 2, buttonRect.width, buttonRect.height);
+                EditorGUI.DrawRect(shadowRect, new Color(0f, 0f, 0f, 0.3f));
+                
+                // Arka plan (renk)
+                EditorGUI.DrawRect(buttonRect, color);
+                
+                // Seçili ise kalın beyaz kenarlık
+                if (isSelected)
                 {
-                    ColorType colorType = colorTypes[i + j];
-                    Color color = GetColorFromColorType(colorType);
-                    
-                    // Seçili renk kontrolü
-                    bool isSelected = selectedColorType == colorType;
-                    Color buttonColor = isSelected ? new Color(color.r * 1.3f, color.g * 1.3f, color.b * 1.3f, 1f) : color;
-                    
-                    // Renk butonu
-                    Rect buttonRect = GUILayoutUtility.GetRect(40, 30, GUILayout.Width(40));
-                    
-                    // Arka plan
-                    EditorGUI.DrawRect(buttonRect, buttonColor);
-                    
-                    // Seçili ise kenarlık
-                    if (isSelected)
+                    Handles.BeginGUI();
+                    Handles.color = Color.white;
+                    // Üst kenar
+                    Handles.DrawLine(
+                        new Vector3(buttonRect.x, buttonRect.y, 0),
+                        new Vector3(buttonRect.xMax, buttonRect.y, 0)
+                    );
+                    // Alt kenar
+                    Handles.DrawLine(
+                        new Vector3(buttonRect.x, buttonRect.yMax, 0),
+                        new Vector3(buttonRect.xMax, buttonRect.yMax, 0)
+                    );
+                    // Sol kenar
+                    Handles.DrawLine(
+                        new Vector3(buttonRect.x, buttonRect.y, 0),
+                        new Vector3(buttonRect.x, buttonRect.yMax, 0)
+                    );
+                    // Sağ kenar
+                    Handles.DrawLine(
+                        new Vector3(buttonRect.xMax, buttonRect.y, 0),
+                        new Vector3(buttonRect.xMax, buttonRect.yMax, 0)
+                    );
+                    Handles.EndGUI();
+                }
+                else
+                {
+                    // Seçili değilse ince gri kenarlık
+                    Handles.BeginGUI();
+                    Handles.color = new Color(0.4f, 0.4f, 0.4f, 0.8f);
+                    Handles.DrawLine(
+                        new Vector3(buttonRect.x, buttonRect.y, 0),
+                        new Vector3(buttonRect.xMax, buttonRect.y, 0)
+                    );
+                    Handles.DrawLine(
+                        new Vector3(buttonRect.x, buttonRect.yMax, 0),
+                        new Vector3(buttonRect.xMax, buttonRect.yMax, 0)
+                    );
+                    Handles.DrawLine(
+                        new Vector3(buttonRect.x, buttonRect.y, 0),
+                        new Vector3(buttonRect.x, buttonRect.yMax, 0)
+                    );
+                    Handles.DrawLine(
+                        new Vector3(buttonRect.xMax, buttonRect.y, 0),
+                        new Vector3(buttonRect.xMax, buttonRect.yMax, 0)
+                    );
+                    Handles.EndGUI();
+                }
+                
+                // Tıklama kontrolü
+                Event currentEvent = Event.current;
+                if (currentEvent.type == EventType.MouseDown && currentEvent.button == 0)
+                {
+                    if (buttonRect.Contains(currentEvent.mousePosition))
                     {
-                        Handles.BeginGUI();
-                        Handles.color = Color.white;
-                        Vector3[] borderVerts = new Vector3[]
-                        {
-                            new Vector3(buttonRect.x, buttonRect.y, 0),
-                            new Vector3(buttonRect.xMax, buttonRect.y, 0),
-                            new Vector3(buttonRect.xMax, buttonRect.yMax, 0),
-                            new Vector3(buttonRect.x, buttonRect.yMax, 0)
-                        };
-                        Handles.DrawPolyLine(borderVerts);
-                        Handles.DrawLine(borderVerts[3], borderVerts[0]);
-                        Handles.EndGUI();
-                    }
-                    
-                    // Tıklama kontrolü
-                    Event currentEvent = Event.current;
-                    if (currentEvent.type == EventType.MouseDown && currentEvent.button == 0)
-                    {
-                        if (buttonRect.Contains(currentEvent.mousePosition))
-                        {
-                            selectedColorType = colorType;
-                            currentEvent.Use();
-                            Repaint();
-                        }
+                        selectedColorType = colorType;
+                        currentEvent.Use();
+                        Repaint();
                     }
                 }
                 
-                EditorGUILayout.EndHorizontal();
+                // Hover efekti
+                if (buttonRect.Contains(currentEvent.mousePosition) && !isSelected)
+                {
+                    EditorGUI.DrawRect(buttonRect, new Color(1f, 1f, 1f, 0.2f));
+                }
+                
+                EditorGUILayout.Space(5);
             }
+            
+            EditorGUILayout.Space(5);
+            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.EndVertical();
         }
 
         private Color GetColorFromColorType(ColorType colorType)
