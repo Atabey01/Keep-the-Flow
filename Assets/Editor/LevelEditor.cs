@@ -986,11 +986,32 @@ namespace DEV.Editor
                 
                 EditorGUI.BeginChangeCheck();
                 
-                // Sütun Sayısı
+                // Yatay Sütun Sayısı
                 EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.LabelField("Sütun Sayısı:", GUILayout.Width(120));
-                int columnCount = EditorGUILayout.IntField(selectedLevel.cannonColumns != null ? selectedLevel.cannonColumns.Count : 0, GUILayout.Width(100));
+                EditorGUILayout.LabelField("Yatay Sütun Sayısı:", GUILayout.Width(120));
+                int horizontalColumnCount = EditorGUILayout.IntField(selectedLevel.cannonColumnGridRowCount > 0 && selectedLevel.cannonColumns != null ? 
+                    (selectedLevel.cannonColumns.Count / selectedLevel.cannonColumnGridRowCount) : 0, GUILayout.Width(100));
                 EditorGUILayout.EndHorizontal();
+                
+                EditorGUILayout.Space(3);
+                
+                // Dikey Satır Sayısı (sütunların dikey düzenlemesi için)
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("Dikey Satır Sayısı:", GUILayout.Width(120));
+                int gridRowCount = EditorGUILayout.IntField(selectedLevel.cannonColumnGridRowCount, GUILayout.Width(100));
+                EditorGUILayout.EndHorizontal();
+                
+                // Grid satır sayısını güncelle
+                if (gridRowCount != selectedLevel.cannonColumnGridRowCount)
+                {
+                    selectedLevel.cannonColumnGridRowCount = Mathf.Max(1, gridRowCount);
+                }
+                
+                // Yatay sütun sayısını güncelle
+                horizontalColumnCount = Mathf.Max(1, horizontalColumnCount);
+                
+                // Toplam sütun sayısını hesapla (yatay sütun sayısı x dikey satır sayısı)
+                int totalColumnsNeeded = horizontalColumnCount * selectedLevel.cannonColumnGridRowCount;
                 
                 // Sütun sayısını güncelle
                 if (selectedLevel.cannonColumns == null)
@@ -998,20 +1019,20 @@ namespace DEV.Editor
                     selectedLevel.cannonColumns = new List<CannonColumn>();
                 }
                 
-                // Sütun sayısı değiştiyse listeyi güncelle
-                while (selectedLevel.cannonColumns.Count < columnCount)
+                // Toplam sütun sayısına göre listeyi güncelle
+                while (selectedLevel.cannonColumns.Count < totalColumnsNeeded)
                 {
                     selectedLevel.cannonColumns.Add(new CannonColumn());
                 }
-                while (selectedLevel.cannonColumns.Count > columnCount)
+                while (selectedLevel.cannonColumns.Count > totalColumnsNeeded)
                 {
                     selectedLevel.cannonColumns.RemoveAt(selectedLevel.cannonColumns.Count - 1);
                 }
                 
                 EditorGUILayout.Space(5);
                 
-                // Sütunlar için ColorType seçimi (yan yana)
-                if (columnCount > 0)
+                // Sütunlar için ColorType seçimi (grid düzeninde)
+                if (totalColumnsNeeded > 0)
                 {
                     EditorGUILayout.LabelField("Sütun Renkleri:", EditorStyles.boldLabel);
                     EditorGUILayout.Space(3);
@@ -1019,69 +1040,79 @@ namespace DEV.Editor
                     // Horizontal scroll view for columns (scroll position'ı kaydet)
                     cannonColumnsHorizontalScroll = EditorGUILayout.BeginScrollView(cannonColumnsHorizontalScroll, false, true, GUILayout.Height(300));
                     
-                    EditorGUILayout.BeginHorizontal();
-                    
-                    for (int colIndex = 0; colIndex < selectedLevel.cannonColumns.Count; colIndex++)
+                    // Grid düzeninde sütunları göster
+                    for (int rowIndex = 0; rowIndex < selectedLevel.cannonColumnGridRowCount; rowIndex++)
                     {
-                        var column = selectedLevel.cannonColumns[colIndex];
-                        if (column == null)
+                        EditorGUILayout.BeginHorizontal();
+                        
+                        for (int colIndex = 0; colIndex < horizontalColumnCount; colIndex++)
                         {
-                            column = new CannonColumn();
-                            selectedLevel.cannonColumns[colIndex] = column;
-                        }
-                        
-                        // Her sütun için vertical layout (dikine dikdörtgen)
-                        EditorGUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.Width(120), GUILayout.Height(280));
-                        
-                        EditorGUILayout.LabelField($"Sütun {colIndex + 1}", EditorStyles.boldLabel);
-                        EditorGUILayout.Space(3);
-                        
-                        // Her sütun için scroll position'ı al veya oluştur
-                        if (!cannonColumnScrollPositions.ContainsKey(colIndex))
-                        {
-                            cannonColumnScrollPositions[colIndex] = Vector2.zero;
-                        }
-                        
-                        // Sütun içindeki renkler için scroll view (scroll position'ı kullan)
-                        cannonColumnScrollPositions[colIndex] = EditorGUILayout.BeginScrollView(
-                            cannonColumnScrollPositions[colIndex], 
-                            GUILayout.Height(200));
-                        
-                        // Mevcut renkleri göster
-                        for (int colorIndex = 0; colorIndex < column.colors.Count; colorIndex++)
-                        {
-                            EditorGUILayout.BeginHorizontal();
-                            column.colors[colorIndex] = (ColorType)EditorGUILayout.EnumPopup(column.colors[colorIndex], GUILayout.Width(100));
+                            // Grid index hesapla: row * horizontalColumnCount + col
+                            int gridIndex = rowIndex * horizontalColumnCount + colIndex;
                             
-                            // Sil butonu
-                            if (GUILayout.Button("X", GUILayout.Width(20)))
+                            if (gridIndex >= selectedLevel.cannonColumns.Count)
+                                break;
+                            
+                            var column = selectedLevel.cannonColumns[gridIndex];
+                            if (column == null)
                             {
-                                Undo.RecordObject(selectedLevel, "Remove Color from Column");
-                                column.colors.RemoveAt(colorIndex);
-                                colorIndex--;
+                                column = new CannonColumn();
+                                selectedLevel.cannonColumns[gridIndex] = column;
+                            }
+                            
+                            // Her sütun için vertical layout (dikine dikdörtgen)
+                            EditorGUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.Width(120), GUILayout.Height(280));
+                            
+                            EditorGUILayout.LabelField($"Sütun {gridIndex + 1} (R{rowIndex + 1}C{colIndex + 1})", EditorStyles.boldLabel);
+                            EditorGUILayout.Space(3);
+                            
+                            // Her sütun için scroll position'ı al veya oluştur
+                            if (!cannonColumnScrollPositions.ContainsKey(gridIndex))
+                            {
+                                cannonColumnScrollPositions[gridIndex] = Vector2.zero;
+                            }
+                            
+                            // Sütun içindeki renkler için scroll view (scroll position'ı kullan)
+                            cannonColumnScrollPositions[gridIndex] = EditorGUILayout.BeginScrollView(
+                                cannonColumnScrollPositions[gridIndex], 
+                                GUILayout.Height(200));
+                            
+                            // Mevcut renkleri göster
+                            for (int colorIndex = 0; colorIndex < column.colors.Count; colorIndex++)
+                            {
+                                EditorGUILayout.BeginHorizontal();
+                                column.colors[colorIndex] = (ColorType)EditorGUILayout.EnumPopup(column.colors[colorIndex], GUILayout.Width(100));
+                                
+                                // Sil butonu
+                                if (GUILayout.Button("X", GUILayout.Width(20)))
+                                {
+                                    Undo.RecordObject(selectedLevel, "Remove Color from Column");
+                                    column.colors.RemoveAt(colorIndex);
+                                    colorIndex--;
+                                    EditorUtility.SetDirty(selectedLevel);
+                                }
+                                EditorGUILayout.EndHorizontal();
+                            }
+                            
+                            EditorGUILayout.EndScrollView();
+                            
+                            EditorGUILayout.Space(5);
+                            
+                            // Renk ekle butonu
+                            if (GUILayout.Button("+ Renk Ekle", GUILayout.Height(25)))
+                            {
+                                Undo.RecordObject(selectedLevel, "Add Color to Column");
+                                column.colors.Add(ColorType.Red);
                                 EditorUtility.SetDirty(selectedLevel);
                             }
-                            EditorGUILayout.EndHorizontal();
+                        
+                            EditorGUILayout.EndVertical();
+                            
+                            EditorGUILayout.Space(5);
                         }
                         
-                        EditorGUILayout.EndScrollView();
-                        
-                        EditorGUILayout.Space(5);
-                        
-                        // Renk ekle butonu
-                        if (GUILayout.Button("+ Renk Ekle", GUILayout.Height(25)))
-                        {
-                            Undo.RecordObject(selectedLevel, "Add Color to Column");
-                            column.colors.Add(ColorType.Red);
-                            EditorUtility.SetDirty(selectedLevel);
-                        }
-                        
-                        EditorGUILayout.EndVertical();
-                        
-                        EditorGUILayout.Space(5);
+                        EditorGUILayout.EndHorizontal();
                     }
-                    
-                    EditorGUILayout.EndHorizontal();
                     
                     EditorGUILayout.EndScrollView();
                 }

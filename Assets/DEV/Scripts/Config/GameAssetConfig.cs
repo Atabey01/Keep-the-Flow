@@ -15,6 +15,14 @@ namespace DEV.Scripts.Config
         [Space(10)]
         public Cube cubePrefab;
         public SplineComputer ConveyorPrefab;
+        public Cannon cannonPrefab;
+        
+        [Header("Game Parent Positions")]
+        public Vector3 ConveyorParentPosition;
+        public Vector3 CannonParentPosition;
+        
+        [Header("Game Offsets")]
+        public Vector3 CannonColumnOffset;
         
         [Header("Game Materials")]
         public SerializedDictionary<Enums.ColorType, Material> Materials = new();

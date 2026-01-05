@@ -12,11 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c3b1413aa90d4fccba90462061cf133, type: 3}
   m_Name: GameAssetConfig
   m_EditorClassIdentifier: 
-  BoxPrefab: {fileID: 887914320613869264, guid: a8faaadf65f2d4fe5aef6d87670e25cd,
+  cubePrefab: {fileID: 887914320613869264, guid: a8faaadf65f2d4fe5aef6d87670e25cd,
     type: 3}
-  BoxRowPrefab: {fileID: 0}
   ConveyorPrefab: {fileID: 3729208817995867157, guid: f37d70a506f5c44dd9465dbef03df067,
     type: 3}
+  cannonPrefab: {fileID: 6382681936167834088, guid: f2b70cb7993f44187ab32adc740a61e6,
+    type: 3}
+  ConveyorParentPosition: {x: 0, y: 0, z: 2.5}
+  CannonParentPosition: {x: 0, y: 0, z: -3}
+  CannonColumnOffset: {x: 0.2, y: 0, z: 0.2}
   Materials:
     _serializedList:
     - Key: 0

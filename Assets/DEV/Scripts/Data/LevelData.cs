@@ -6,30 +6,16 @@ using UnityEngine;
 namespace DEV.Scripts.Data
 {
     /// <summary>
-    /// Tek bir Box'ı temsil eden veri yapısı
-    /// </summary>
-    [Serializable]
-    public class BoxData
-    {
-        [SerializeField] public ColorType colorType;
-        
-        public BoxData(ColorType color)
-        {
-            colorType = color;
-        }
-    }
-    
-    /// <summary>
     /// Bir satırdaki (row) tüm Box'ları tutan veri yapısı
     /// </summary>
     [Serializable]
     public class BoxRowData
     {
-        [SerializeField] public List<BoxData> boxes = new List<BoxData>();
+        [SerializeField] public List<ColorType> boxes = new List<ColorType>();
         
         public BoxRowData()
         {
-            boxes = new List<BoxData>();
+            boxes = new List<ColorType>();
         }
         
         /// <summary>
@@ -37,7 +23,7 @@ namespace DEV.Scripts.Data
         /// </summary>
         public void AddBox(ColorType colorType)
         {
-            boxes.Add(new BoxData(colorType));
+            boxes.Add(colorType);
         }
         
         /// <summary>
@@ -108,6 +94,9 @@ namespace DEV.Scripts.Data
         [SerializeField] public List<CellData> cellDataList = new List<CellData>();
         
         [Header("Cannon Columns")]
+        [Tooltip("Cannon columns grid row count (vertical arrangement of columns)")]
+        [SerializeField] public int cannonColumnGridRowCount = 1;
+        
         [Tooltip("Cannon columns (each column contains a list of color types)")]
         [SerializeField] public List<CannonColumn> cannonColumns = new List<CannonColumn>();
         

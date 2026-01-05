@@ -16,48 +16,12 @@ MonoBehaviour:
   skipInLoop: 0
   LevelDifficultyType: 0
   rows:
-  - boxes:
-    - colorType: 0
-    - colorType: 0
-    - colorType: 0
-    - colorType: 0
-    - colorType: 0
-    - colorType: 0
-  - boxes:
-    - colorType: 0
-    - colorType: 0
-    - colorType: 0
-    - colorType: 0
-    - colorType: 0
-    - colorType: 0
-  - boxes:
-    - colorType: 0
-    - colorType: 0
-    - colorType: 0
-    - colorType: 0
-    - colorType: 0
-    - colorType: 0
-  - boxes:
-    - colorType: 0
-    - colorType: 0
-    - colorType: 0
-    - colorType: 0
-    - colorType: 0
-    - colorType: 0
-  - boxes:
-    - colorType: 0
-    - colorType: 0
-    - colorType: 0
-    - colorType: 0
-    - colorType: 0
-    - colorType: 0
-  - boxes:
-    - colorType: 0
-    - colorType: 0
-    - colorType: 0
-    - colorType: 0
-    - colorType: 0
-    - colorType: 0
+  - boxes: 000000000000000000000000000000000000000000000000
+  - boxes: 000000000000000000000000000000000000000000000000
+  - boxes: 000000000000000000000000000000000000000000000000
+  - boxes: 000000000000000000000000000000000000000000000000
+  - boxes: 000000000000000000000000000000000000000000000000
+  - boxes: 000000000000000000000000000000000000000000000000
   gridSatirSayisi: 6
   gridSutunSayisi: 6
   conveyorPoints:
@@ -114,6 +78,9 @@ MonoBehaviour:
     colorType: 3
   - gridPosition: {x: 4, y: 1}
     colorType: 3
+  cannonColumnGridRowCount: 2
   cannonColumns:
-  - colors: 
-  - colors: 
+  - colors: 0000000000000000
+  - colors: 0000000000000000
+  - colors: 0000000000000000
+  - colors: 0000000000000000
