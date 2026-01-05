@@ -23,8 +23,20 @@ namespace DEV.Scripts.Handlers
             _levelData = levelData;
             _gameConfig = gameConfig;
             
+            CreateParents();
             CreateConveyor(levelData);
             CreateBoxes(levelData);
+            CreateCannons(levelData);
+        }
+
+        private void CreateParents()
+        {
+            
+        }
+
+        private void CreateCannons(LevelData levelData)
+        {
+            
         }
 
         private void CreateBoxes(LevelData levelData)
@@ -35,7 +47,7 @@ namespace DEV.Scripts.Handlers
                 return;
             }
             
-            var boxPrefab = _gameConfig.GameAssetsConfig.BoxPrefab;
+            var boxPrefab = _gameConfig.GameAssetsConfig.cubePrefab;
             if (boxPrefab == null)
             {
                 Debug.LogError("LevelBuilder: BoxPrefab bulunamadı!");
@@ -53,8 +65,8 @@ namespace DEV.Scripts.Handlers
                     continue;
                 
                 // Factory ile Box oluştur
-                Box box = Factory.Create<Box>(boxPrefab.gameObject, LevelParent?.transform, usePooling: false);
-                if (box == null)
+                Cube cube = Factory.Create<Cube>(boxPrefab.gameObject, LevelParent?.transform, usePooling: false);
+                if (cube == null)
                 {
                     Debug.LogError($"LevelBuilder: Box oluşturulamadı! Grid Position: {cellData.gridPosition}");
                     continue;
@@ -74,12 +86,12 @@ namespace DEV.Scripts.Handlers
                     zPos - gridCenterZ
                 );
                 
-                box.transform.position = position;
-                box.name = $"Box_{cellData.gridPosition.x}_{cellData.gridPosition.y}";
+                cube.transform.position = position;
+                cube.name = $"Box_{cellData.gridPosition.x}_{cellData.gridPosition.y}";
                 
                 // BoxData oluştur ve Initialize çağır
                 BoxData boxData = new BoxData(cellData.colorType);
-                box.Initialize(boxData, levelData, _gameConfig);
+                cube.Initialize(boxData, levelData, _gameConfig);
             }
             
             Debug.Log($"LevelBuilder: Box'lar oluşturuldu! Toplam {levelData.cellDataList.Count} cell data'dan box oluşturuldu.");

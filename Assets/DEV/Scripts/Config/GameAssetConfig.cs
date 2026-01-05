@@ -13,8 +13,7 @@ namespace DEV.Scripts.Config
         
         [Header("Game Prefabs")] 
         [Space(10)]
-        public Box BoxPrefab;
-        public BoxRow BoxRowPrefab;
+        public Cube cubePrefab;
         public SplineComputer ConveyorPrefab;
         
         [Header("Game Materials")]

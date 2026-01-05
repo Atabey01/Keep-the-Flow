@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace DEV.Scripts.GamePlay
 {
-    public class Box : MonoBehaviour
+    public class Cube : MonoBehaviour
     {
         [SerializeField] private MeshRenderer meshRenderer;
         private BoxData _boxData;

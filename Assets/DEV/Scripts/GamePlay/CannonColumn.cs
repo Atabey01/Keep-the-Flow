@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace DEV.Scripts.GamePlay
 {
-    public class BoxRow : MonoBehaviour
+    public class CannonColumn : MonoBehaviour
     {
       
     }
