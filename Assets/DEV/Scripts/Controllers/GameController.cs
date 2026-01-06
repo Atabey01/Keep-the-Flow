@@ -1,8 +1,11 @@
 using DEV.Scripts.Config;
 using DEV.Scripts.Data;
+using DEV.Scripts.GamePlay;
 using DEV.Scripts.Handlers;
 using DEV.Scripts.Interfaces;
+using System.Collections.Generic;
 using UnityEngine;
+using CannonColumn = DEV.Scripts.GamePlay.CannonColumn;
 
 namespace DEV.Scripts.Controllers
 {
@@ -10,6 +13,10 @@ namespace DEV.Scripts.Controllers
     {
         private LevelBuilder _levelBuilder;
         private GameConfig _gameConfig;
+        
+        // Level referansları
+        private ConveyorController _conveyorController;
+        private List<CannonColumn> _cannonColumns = new List<CannonColumn>();
 
         public GameController(LevelBuilder levelBuilder)
         {
@@ -32,6 +39,10 @@ namespace DEV.Scripts.Controllers
             }
             
             _levelBuilder.StartNewLevel(levelData, _gameConfig);
+            
+            // LevelBuilder'dan referansları al
+            _conveyorController = _levelBuilder.GetConveyorController();
+            _cannonColumns = _levelBuilder.GetCannonColumns();
         }
         
         public void MouseDown(GameObject clickedGameObject)

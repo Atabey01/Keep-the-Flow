@@ -1,6 +1,5 @@
 using AYellowpaper.SerializedCollections;
 using DEV.Scripts.GamePlay;
-using Dreamteck.Splines;
 using UnityEngine;
 
 namespace DEV.Scripts.Config
@@ -14,7 +13,7 @@ namespace DEV.Scripts.Config
         [Header("Game Prefabs")] 
         [Space(10)]
         public Cube cubePrefab;
-        public SplineComputer ConveyorPrefab;
+        public ConveyorController ConveyorPrefab;
         public Cannon cannonPrefab;
         
         [Header("Game Parent Positions")]

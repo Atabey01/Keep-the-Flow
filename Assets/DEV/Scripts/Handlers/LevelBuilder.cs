@@ -2,9 +2,8 @@ using DEV.Scripts.Config;
 using DEV.Scripts.Data;
 using DEV.Scripts.GamePlay;
 using DEV.Scripts.Managers;
-using Dreamteck.Splines;
-using System.Collections.Generic;
 using DEV.Scripts.Enums;
+using System.Collections.Generic;
 using UnityEngine;
 using CannonColumn = DEV.Scripts.GamePlay.CannonColumn;
 
@@ -21,6 +20,10 @@ namespace DEV.Scripts.Handlers
         private GameObject _conveyorParent;
         private GameObject _boxesParent;
         private GameObject _cannonsParent;
+        
+        // Level referansları
+        private ConveyorController _conveyorController;
+        private List<CannonColumn> _cannonColumns = new List<CannonColumn>();
         
         private const float GRID_CELL_SIZE = 1f; // Her grid hücresi 1 unit
         
@@ -124,6 +127,9 @@ namespace DEV.Scripts.Handlers
                 
                 // CannonColumn component ekle
                 CannonColumn cannonColumn = columnGameObject.AddComponent<CannonColumn>();
+                
+                // CannonColumn'u listeye ekle
+                _cannonColumns.Add(cannonColumn);
                 
                 // Column içindeki her renk tipi için Cannon oluştur
                 for (int colorIndex = 0; colorIndex < columnData.colors.Count; colorIndex++)
@@ -237,50 +243,40 @@ namespace DEV.Scripts.Handlers
                 return;
             }
             
-            // Factory ile SplineComputer oluştur (prefab GameObject olmalı)
+            // Factory ile ConveyorController oluştur (prefab GameObject olmalı)
             GameObject prefabGameObject = conveyorPrefab.gameObject;
-            SplineComputer splineComputer = Factory.Create<SplineComputer>(prefabGameObject, _conveyorParent?.transform, usePooling: false);
-            if (splineComputer == null)
+            ConveyorController conveyor = Factory.Create<ConveyorController>(prefabGameObject, _conveyorParent?.transform, usePooling: false);
+            if (conveyor == null)
             {
                 Debug.LogError("LevelBuilder: Conveyor oluşturulamadı!");
                 return;
             }
             
-            splineComputer.name = "Conveyor";
-            splineComputer.transform.localPosition = Vector3.zero;
+            conveyor.name = "Conveyor";
+            conveyor.transform.localPosition = Vector3.zero;
+            conveyor.gridCellSize = GRID_CELL_SIZE;
             
-            // Grid koordinatlarını SplinePoint'lere çevir
-            List<SplinePoint> splinePoints = new List<SplinePoint>();
+            // Spline hesaplamasını ConveyorController'a devret
+            conveyor.Initialize(levelData, _gameConfig);
             
-            int gridWidth = levelData.gridSutunSayisi;
-            int gridHeight = levelData.gridSatirSayisi;
-            
-            foreach (var gridPoint in levelData.conveyorPoints)
-            {
-                // Grid koordinatlarını local pozisyona çevir
-                float xPos = gridPoint.x * GRID_CELL_SIZE;
-                float zPos = gridPoint.y * GRID_CELL_SIZE;
-                
-                // Grid merkezinden offset hesapla (local space)
-                float gridCenterX = (gridWidth - 1) * GRID_CELL_SIZE * 0.5f;
-                float gridCenterZ = (gridHeight - 1) * GRID_CELL_SIZE * 0.5f;
-                
-                // Local space pozisyonu (Y ekseni 0'da, XZ düzleminde)
-                Vector3 localPos = new Vector3(
-                    xPos - gridCenterX,
-                    0f,
-                    zPos - gridCenterZ
-                );
-                
-                // SplinePoint oluştur (zaten local space'de)
-                SplinePoint point = new SplinePoint(localPos);
-                splinePoints.Add(point);
-            }
-            
-            // SplineComputer'a noktaları ayarla (Local space)
-            splineComputer.SetPoints(splinePoints.ToArray(), SplineComputer.Space.Local);
-            
-            Debug.Log($"LevelBuilder: Conveyor oluşturuldu! {splinePoints.Count} nokta eklendi.");
+            // ConveyorController referansını sakla
+            _conveyorController = conveyor;
+        }
+        
+        /// <summary>
+        /// Oluşturulan ConveyorController referansını döndürür
+        /// </summary>
+        public ConveyorController GetConveyorController()
+        {
+            return _conveyorController;
+        }
+        
+        /// <summary>
+        /// Oluşturulan tüm CannonColumn referanslarını döndürür
+        /// </summary>
+        public List<CannonColumn> GetCannonColumns()
+        {
+            return _cannonColumns;
         }
     }
 }

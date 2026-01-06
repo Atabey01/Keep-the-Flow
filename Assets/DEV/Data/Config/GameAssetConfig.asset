@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cubePrefab: {fileID: 887914320613869264, guid: a8faaadf65f2d4fe5aef6d87670e25cd,
     type: 3}
-  ConveyorPrefab: {fileID: 3729208817995867157, guid: f37d70a506f5c44dd9465dbef03df067,
+  ConveyorPrefab: {fileID: 3790281395100142766, guid: f37d70a506f5c44dd9465dbef03df067,
     type: 3}
   cannonPrefab: {fileID: 6382681936167834088, guid: f2b70cb7993f44187ab32adc740a61e6,
     type: 3}
